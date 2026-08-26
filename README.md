@@ -7,6 +7,7 @@ Part of [Agency Agents OS](https://github.com/Anil-matcha/agency-agents-os), an 
 ## Related Projects
 
 - [Agency Agents OS](https://github.com/Anil-matcha/agency-agents-os) — the central catalog this repo is part of.
+- [ai-youtube-agent](https://github.com/SamurAIGPT/ai-youtube-agent) — uses this repo's keyword-research capability as a Google-data proxy until YouTube-native keyword data is live; shares the same underlying provider (DataForSEO).
 - [ai-aeo-geo-agent](https://github.com/SamurAIGPT/ai-aeo-geo-agent) — shares the same live Muapi SEO endpoints for AI-citation visibility instead of classic search rankings.
 - [ai-competitor-intelligence-agent](https://github.com/SamurAIGPT/ai-competitor-intelligence-agent) — cross-cuts this repo's domain/backlink data with ads and social signals.
 - [ai-ecommerce-agent](https://github.com/SamurAIGPT/ai-ecommerce-agent) — its local-business-leads sub-agent overlaps with this repo's live local-SEO endpoints.
