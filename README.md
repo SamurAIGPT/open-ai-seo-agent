@@ -4,6 +4,16 @@ An AI agent for SEO and organic-growth work — rank/opportunity tracking, compe
 
 Part of [Agency Agents OS](https://github.com/Anil-matcha/agency-agents-os), an open ecosystem of specialized AI agents for real business work.
 
+## Related Projects
+
+- [Agency Agents OS](https://github.com/Anil-matcha/agency-agents-os) — the central catalog this repo is part of.
+- [ai-aeo-geo-agent](https://github.com/SamurAIGPT/ai-aeo-geo-agent) — shares the same live Muapi SEO endpoints for AI-citation visibility instead of classic search rankings.
+- [ai-competitor-intelligence-agent](https://github.com/SamurAIGPT/ai-competitor-intelligence-agent) — cross-cuts this repo's domain/backlink data with ads and social signals.
+- [ai-ecommerce-agent](https://github.com/SamurAIGPT/ai-ecommerce-agent) — its local-business-leads sub-agent overlaps with this repo's live local-SEO endpoints.
+- [MuAPI MCP docs](https://muapi.ai/docs/mcp) — connect this repo's `SKILL.md` files via MCP.
+- [MuAPI API reference](https://muapi.ai/docs/api-reference) — request/poll pattern used by the live `seo-*` endpoints this repo is built on.
+- [MuAPI access keys](https://muapi.ai/access-keys) — create the API key this agent needs.
+
 ## What this covers
 
 This repo is the umbrella for anything an agency or in-house team would call "the AI SEO agent": finding ranking opportunities, watching what competitors are doing in search, spotting content gaps, tracking local/map rankings, auditing backlink profiles, monitoring SEO/PR news that affects strategy, and optimizing app store listings — without a human manually pulling reports from five different tools.
