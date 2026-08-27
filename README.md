@@ -1,90 +1,147 @@
 # AI SEO Agent
 
-An AI agent for SEO and organic-growth work — rank/opportunity tracking, competitor SEO analysis, content gap discovery, local SEO, backlink intelligence, SEO/PR news monitoring, and app store optimization — backed by real search and analytics APIs.
+Portable SEO skills for existing AI agents. The host agent supplies the reasoning,
+planning, tool execution, and conversation; this repository supplies the SEO
+workflows, Muapi tool map, decision rules, and report formats.
 
-Part of [Agency Agents OS](https://github.com/Anil-matcha/agency-agents-os), an open ecosystem of specialized AI agents for real business work.
+No custom agent runtime is required.
 
-## Related Projects
+## What this enables
 
-- [Agency Agents OS](https://github.com/Anil-matcha/agency-agents-os) — the central catalog this repo is part of.
-- [ai-youtube-agent](https://github.com/SamurAIGPT/ai-youtube-agent) — uses this repo's keyword-research capability as a Google-data proxy until YouTube-native keyword data is live; shares the same underlying provider (DataForSEO).
-- [ai-aeo-geo-agent](https://github.com/SamurAIGPT/ai-aeo-geo-agent) — shares the same live Muapi SEO endpoints for AI-citation visibility instead of classic search rankings.
-- [ai-competitor-intelligence-agent](https://github.com/SamurAIGPT/ai-competitor-intelligence-agent) — cross-cuts this repo's domain/backlink data with ads and social signals.
-- [ai-ecommerce-agent](https://github.com/SamurAIGPT/ai-ecommerce-agent) — its local-business-leads sub-agent overlaps with this repo's live local-SEO endpoints.
-- [MuAPI MCP docs](https://muapi.ai/docs/mcp) — connect this repo's `SKILL.md` files via MCP.
-- [MuAPI API reference](https://muapi.ai/docs/api-reference) — request/poll pattern used by the live `seo-*` endpoints this repo is built on.
-- [MuAPI access keys](https://muapi.ai/access-keys) — create the API key this agent needs.
+After the skills are installed and the host agent can reach Muapi, an existing
+agent can perform:
 
-## What this covers
+- site and SEO project intake
+- keyword discovery, metrics, clustering, and prioritization
+- domain visibility and competitor analysis
+- content-gap and relevant-page analysis
+- ranking snapshots, comparisons, and trend reports
+- backlink profile, page, and history analysis
+- Lighthouse and Core Web Vitals reviews
+- local search, listing, profile, review, Q&A, and update analysis
+- AI-search visibility and answer testing
+- YouTube search and video analysis
 
-This repo is the umbrella for anything an agency or in-house team would call "the AI SEO agent": finding ranking opportunities, watching what competitors are doing in search, spotting content gaps, tracking local/map rankings, auditing backlink profiles, monitoring SEO/PR news that affects strategy, and optimizing app store listings — without a human manually pulling reports from five different tools.
+Every workflow is designed to produce an evidence-backed report rather than a
+raw API dump or unsupported recommendation.
 
-## Sub-agents
+## How the package works
 
-| Agent | Does | Status |
+1. Install one or more skills from agents/ into the host agent's skill directory
+   or load the skill file as task instructions.
+2. Connect the host agent to Muapi through MCP or an equivalent API connector.
+3. Give the agent a domain, business, keyword set, competitors, URL, or video.
+4. The agent follows the selected workflow, calls only the required Muapi tools,
+   and records the request parameters with the findings.
+5. The agent writes a readable report and, when a comparison is requested, a
+   dated raw snapshot in the user's workspace.
+
+The external target is never edited by these skills. Local report and snapshot
+files are allowed so a later run can compare results.
+
+## Skills
+
+| Skill | Purpose | Status |
 |---|---|---|
-| [SEO Growth](agents/seo-growth/SKILL.md) | Finds ranking and traffic-growth opportunities from keyword and domain data | Blueprint |
-| [Competitor SEO](agents/competitor-seo/SKILL.md) | Tracks a competitor's organic rankings, top pages, and backlink profile | Blueprint |
-| [Content Gap](agents/content-gap/SKILL.md) | Identifies keywords a competitor ranks for that a site doesn't cover | Blueprint |
-| [Local SEO](agents/local-seo/SKILL.md) | Tracks local/map-pack rankings and Google Business Profile health | Blueprint |
-| [Backlink Intelligence](agents/backlink-intelligence/SKILL.md) | Audits a site's backlink profile and referring-domain quality | Blueprint |
-| [News Monitoring](agents/news-monitoring/SKILL.md) | Monitors SEO/PR/search-engine news for changes that affect strategy | Coming Soon |
-| [ASO](agents/aso/SKILL.md) | Optimizes app store listings for discoverability and conversion | Coming Soon |
+| [SEO project setup](agents/seo-project-setup/SKILL.md) | Establish the domain, market, goals, competitors, and workspace context | Ready |
+| [Keyword research](agents/keyword-research/SKILL.md) | Discover, validate, expand, cluster, and prioritize target terms | Ready |
+| [Keyword clustering](agents/keyword-clustering/SKILL.md) | Group terms by intent and SERP evidence to prevent cannibalization | Ready |
+| [SEO growth](agents/seo-growth/SKILL.md) | Find page-two wins and new growth opportunities | Ready |
+| [Competitor SEO](agents/competitor-seo/SKILL.md) | Compare domains, rankings, SERPs, pages, and backlinks | Ready |
+| [Content gap](agents/content-gap/SKILL.md) | Turn competitor and domain data into prioritized content briefs | Ready |
+| [Rank tracking](agents/rank-tracking/SKILL.md) | Capture ranking snapshots and calculate changes between runs | Ready |
+| [Technical SEO audit](agents/technical-seo-audit/SKILL.md) | Review Lighthouse scores, Core Web Vitals, and page-level risks | Ready |
+| [Backlink intelligence](agents/backlink-intelligence/SKILL.md) | Analyze backlink sources, anchor patterns, pages, and history | Ready |
+| [Local SEO](agents/local-seo/SKILL.md) | Analyze map results and business-profile health | Ready |
+| [AI visibility](agents/ai-visibility/SKILL.md) | Measure brand mentions, citations, share of voice, and answer quality | Ready |
+| [YouTube SEO](agents/youtube-seo/SKILL.md) | Research YouTube results and analyze videos, transcripts, and comments | Ready |
+| [SEO/PR news monitoring](agents/news-monitoring/SKILL.md) | Reserved until Muapi exposes the required news and performance data | Unavailable |
+| [App store optimization](agents/aso/SKILL.md) | Reserved until Muapi exposes app-store search and conversion data | Unavailable |
 
-## Required Muapi APIs
+The skills are intentionally composable. For example, a content strategy run
+can use project setup, keyword research, competitor SEO, content gap, and
+technical audit in one host-agent session.
 
-Live today:
+## Muapi connection
 
-- `seo.google_serp` — location/device-specific Google organic SERP snapshot for a keyword.
-- `seo.keyword_research` — keyword overview: search volume, difficulty, and related-term suggestions.
-- `seo.domain_overview` — domain organic visibility, ranked keywords, and top competitors.
-- `seo.backlinks` — backlink profile: referring domains, link types, and anchor text.
-- `seo.rank_track` / `seo.rank_track_batch` — organic ranking position for one or many keywords against a target domain, tracked over time.
-- `seo.local_serp` — Google Maps / Local Finder rankings for a keyword and location.
-- `seo.business_listings` / `seo.business_profile` / `seo.business_reviews` — local business listing, Google Business Profile, and review data.
-- `seo.lighthouse_audit` — on-page performance, accessibility, SEO, and Core Web Vitals audit for a URL.
+The host agent needs access to the Muapi MCP server or an equivalent connector.
+Use the official Muapi connection instructions for the client being used:
 
-Not yet live (needed by News Monitoring and ASO):
+- MCP endpoint: https://api.muapi.ai/mcp
+- API reference: https://muapi.ai/docs/api-reference
+- MCP setup: https://muapi.ai/docs/mcp
 
-- `seo.news_monitoring` — SEO/search-engine/PR news tracking.
-- `aso.listing_optimization` — app store listing search-rank and conversion data.
+Never commit an API key. Prefer an environment variable or the host agent's
+secret/connector storage. The skills use logical capability names such as
+seo.google_serp; the endpoint catalog records the corresponding HTTP task name
+and request fields.
 
-## Setup
+For an HTTP-only connector, submit a POST request to the Muapi API task endpoint,
+then poll the returned request ID until the result is ready. The connector
+should preserve both the result and billing object in the report source record.
 
-1. Create a Muapi account and API key at [muapi.ai](https://muapi.ai).
-2. Review the [Muapi API quickstart](https://muapi.ai) and [OpenAPI schema](https://api.muapi.ai/openapi.json) — the live endpoints are `/api/v1/seo-google-serp`, `/seo-keyword-research`, `/seo-domain-overview`, `/seo-backlinks`, `/seo-lighthouse-audit`, `/seo-rank-track`, `/seo-rank-track-batch`, `/seo-local-serp`, `/seo-business-listings`, `/seo-business-profile`, and `/seo-business-reviews`.
-3. Load the `SKILL.md` for the sub-agent you need into your agent runtime, or follow it manually.
+## Complete Muapi SEO coverage
 
+The canonical mapping for all currently registered SEO tasks is in
+[references/muapi-seo-tools.md](references/muapi-seo-tools.md). It covers:
 
-## Using with an AI agent
+- 11 core search, domain, backlink, audit, rank, and local tasks
+- 7 keyword, page, backlink-history, and AI-visibility expansion tasks
+- 4 local and account utility tasks
+- 4 YouTube tasks
+- 2 AI answer and mention tasks
 
-Every sub-agent's `SKILL.md` is model- and runtime-agnostic — it's plain Markdown, so it works with any LLM agent, not just Claude. Two integration paths:
+The skills should consult the live Muapi schema when a field, limit, or enum is
+not shown in the local reference. The live schema is authoritative.
 
-**As an MCP connection (the agent gets live Muapi tools):**
+Run the dependency-free package check with:
 
-Muapi runs an MCP server at `https://api.muapi.ai/mcp` that any MCP-compatible client can connect to — Cursor, Windsurf, Claude, or your own custom agent.
+~~~sh
+python3 scripts/validate_package.py
+~~~
 
-- **Cursor / Windsurf / other clients with a header field:** connect to `https://api.muapi.ai/mcp` with an `Authorization: Bearer YOUR_MUAPI_KEY` header.
-- **claude.ai / Claude Cowork / other connector UIs with no header field:** use the URL-embedded key form instead, `https://api.muapi.ai/mcp/YOUR_MUAPI_KEY`, via Settings → Connectors → Add custom connector.
-- **Claude Code / Claude Desktop:** `claude mcp add muapi -e MUAPI_API_KEY=YOUR_MUAPI_KEY -- muapi mcp serve` (uses the muapi CLI's stdio transport — Claude Code's HTTP MCP client doesn't reliably inject tools).
+## Reports and snapshots
 
-Full setup details for every client: [muapi.ai/docs/mcp](https://muapi.ai/docs/mcp).
+Use the conventions in
+[references/reports-and-snapshots.md](references/reports-and-snapshots.md):
 
-**As agent instructions (any LLM follows the workflow directly):**
+~~~text
+.seo/
+  project.md
+  reports/YYYY-MM-DD/<run-slug>.md
+  sources/YYYY-MM-DD/<run-slug>/<tool-name>.json
+  snapshots/rankings/<market>/<YYYY-MM-DD>.json
+  snapshots/backlinks/<YYYY-MM-DD>.json
+  snapshots/ai-visibility/<YYYY-MM-DD>.json
+~~~
 
-Drop a sub-agent's `SKILL.md` into a Claude Code project's `.claude/skills/` directory, paste it into a custom-GPT/Project's system instructions, hand it to an autonomous agent framework as a tool spec, or attach it directly in a chat conversation — then ask the agent to follow it.
+Raw sources make every recommendation auditable. A later run must compare
+snapshots only when the keyword, domain, location, language, device, depth, and
+date window are compatible.
 
-## Read-only vs. write actions
+## Safety and quality rules
 
-Every sub-agent here is `read-only` — they analyze and report, never publish or change live SEO settings.
+- Confirm the target domain, market, language, device, and comparison window
+  before paid calls.
+- Check seo-account-status when balance or provider availability is unknown.
+- Ask before a large batch, deep SERP request, AI-response run, or repeated
+  competitor scan.
+- Do not claim a ranking, volume, sentiment, citation, or trend that is absent
+  from a Muapi response.
+- Distinguish observed data, calculated values, and hypotheses.
+- Keep the exact request parameters and retrieval timestamp with every source.
+- Treat a missing result as missing data, not as evidence of zero visibility.
+- External operations are read-only. Report and snapshot writes require no
+  external SEO permission.
+- Stop and state the limitation when a requested capability is not exposed by
+  Muapi; do not substitute guessed data.
 
-## Status and limitations
+## Limitations
 
-Five of the seven sub-agents (SEO Growth, Competitor SEO, Content Gap, Local SEO, Backlink Intelligence) are **Blueprint**: they're built entirely on Muapi SEO endpoints that are live today, but haven't yet been verified end-to-end from inside this repo. News Monitoring and ASO are **Coming Soon** — they depend on capabilities (news tracking, app-store data) that Muapi doesn't expose yet.
-
-## Contributing
-
-See [Agency Agents OS CONTRIBUTING.md](https://github.com/Anil-matcha/agency-agents-os/blob/main/CONTRIBUTING.md).
+Muapi currently supplies the SEO capabilities listed in the tool catalog. This
+package does not claim native Google Search Console, Google Analytics, app-store
+data, or news-monitoring support unless a connected tool explicitly provides
+it. A Lighthouse result is a page audit, not a complete site crawl.
 
 ## License
 

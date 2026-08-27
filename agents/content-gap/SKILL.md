@@ -1,81 +1,92 @@
 ---
-name: Content Gap Agent
+name: Content Gap
 slug: content-gap
-version: 1.0.0
+version: 2.0.0
 category: seo
-description: Identify keywords and topics competitors rank for that a site doesn't cover, and prioritize which gaps are worth filling.
-status: blueprint
+description: Find competitor-covered topics that a domain lacks or covers weakly, then turn them into non-cannibalizing content briefs.
+status: ready
 muapi_capabilities:
   - seo.domain_overview
-  - seo.keyword_research
+  - seo.relevant_pages
+  - seo.keyword_overview
+  - seo.keywords_search_volume
+  - seo.keywords_for_keywords
   - seo.google_serp
 required_connections:
   - muapi
 permissions:
-  - read-only
+  - external-read-only
+  - workspace-write
 ---
 
-# Content Gap Agent
+# Content Gap
 
 ## Mission
 
-Find the topics and keywords where competitors have ranking content and the user's site has none (or weak coverage), and turn that into a prioritized content brief list rather than a raw keyword dump.
-
-## Use this agent when
-
-- A user asks "what content are we missing compared to competitors."
-- A user wants a prioritized list of new articles/pages to write for SEO.
-- A user has a content calendar to fill and wants data-backed topic ideas instead of guesses.
-- A user wants to know if an existing page is too thin compared to what's ranking, rather than genuinely missing.
+Identify demand-backed topics where competitors have visible coverage and the
+user's domain has no or weak coverage. End with a page brief and intent
+decision, not an unfiltered keyword dump.
 
 ## Required inputs
 
-- The user's own domain.
-- A list of 2-5 competitor domains to diff against.
-- Optional: a topic/category scope (e.g. "only product pages," "only blog content") to keep the gap analysis focused.
-- Optional: minimum search volume threshold to filter out negligible-traffic gaps.
-
-## Required connections
-
-- A Muapi API key (`muapi`).
-
-## Available Muapi capabilities
-
-- `seo.domain_overview` (`POST /seo-domain-overview`) — ranked keywords and positions for a domain; called once for the user's own domain and once per competitor to see who covers what.
-- `seo.keyword_research` (`POST /seo-keyword-research`) — search volume, difficulty, and related/expansion terms for each candidate gap.
-- `seo.google_serp` (`POST /seo-google-serp`) — a live SERP snapshot for a specific query, to spot-check who's actually ranking right now for a high-priority gap before committing a content brief to it.
+- User's domain.
+- Two to five competitor domains.
+- Country and language.
+- Optional: topic scope, URL section, minimum volume, business priority, and
+  maximum number of briefs.
 
 ## Workflow
 
-1. Call `seo.domain_overview` for the user's own domain to build the set of keywords already covered (including keywords the domain ranks weakly for, not just page-1 winners).
-2. Call `seo.domain_overview` for each competitor domain in the set to get their ranked-keyword lists.
-3. Diff the competitor-covered keyword sets against the user's covered set: anything a competitor ranks for (top 20) and the user doesn't appear for at all is a hard gap; anything the user ranks for only outside the top 20 while a competitor holds top-10 is a weak-coverage gap.
-4. Expand each hard-gap keyword with `seo.keyword_research` to pull related terms and confirm real search volume — cluster tightly related keywords into a single content brief rather than proposing one page per keyword variant.
-5. Filter out clusters below the user's minimum volume threshold (default: drop anything under 50 monthly searches unless the user says otherwise).
-6. Score remaining clusters by volume × (number of competitors ranking for it, as a proxy for commercial relevance) and sort descending.
-7. For the top few clusters, call `seo.google_serp` on the representative keyword to see exactly who's ranking right now and in what format (guide, comparison, tool page, etc.) as context for the brief — without copying their content.
-8. Output a prioritized brief list; do not hand off to a writing agent automatically — the user decides which briefs to act on.
+1. Read .seo/project.md and confirm canonical domains and priority sections.
+2. Call seo.domain_overview for the user's domain and each competitor with
+   matching market, language, and useful limits.
+3. Call seo.relevant_pages for the user domain when page-level coverage needs
+   verification. Use returned pages as evidence, not as proof that a page
+   satisfies an intent.
+4. Normalize returned keyword records and create:
+   - hard gaps: competitors rank in the available data and the user domain has
+     no matching record
+   - weak coverage: the user domain ranks, but competitors or current SERPs
+     show a materially stronger result
+   Treat both sets as bounded by provider result limits.
+5. Expand important candidates with seo.keywords_for_keywords and validate the
+   final terms with seo.keyword_overview or seo.keywords_search_volume.
+6. Use seo.google_serp on representative terms to determine intent, dominant
+   page format, ranking URL patterns, and SERP features.
+7. Group near-duplicate terms into one cluster. Identify an existing page to
+   refresh when evidence supports it; otherwise propose one new page.
+8. Prioritize clusters using explicit business priority first, then validated
+   demand, competitor coverage, intent fit, and effort. Label this as a
+   calculated prioritization, not a provider score.
+9. Save the source records and content-brief report.
 
 ## Decision rules
 
-- A keyword only counts as a gap if the user's domain doesn't appear in its top-20 ranked-keyword list; anything ranking 11-20 is a "weak coverage" item for the SEO Growth agent, not a net-new content gap.
-- Cluster near-duplicate keyword variants into one brief; never propose two separate pages that would cannibalize each other for the same intent.
-- Drop clusters below the volume threshold even if multiple competitors rank for them — low absolute volume isn't worth a dedicated content investment by default.
-- Note the competitor's content format (comparison, listicle, tool, guide) as a signal for what format tends to rank for that query, but never copy competitor text or structure verbatim.
-
-## Approval boundaries
-
-This agent is `read-only` — it produces a prioritized brief list, not drafted content or published pages. Actual content creation is a separate, explicitly approved step outside this agent (and outside this repo).
+- A hard gap means absent from the returned dataset, not proof that the domain
+  has never appeared.
+- Do not propose one page per keyword variant.
+- A competitor ranking does not prove that the topic is commercially valuable.
+- Do not recommend a page when SERP evidence shows a different intent from the
+  user's business.
+- Keep volume thresholds user-configurable and preserve excluded candidates
+  with reasons.
+- Never copy competitor wording, claims, or content structure.
 
 ## Output format
 
-A prioritized cluster list: topic cluster name, representative keywords, combined search volume, number of competitors ranking, gap type (hard gap / weak coverage), and observed competitor content format.
+For each brief, return:
+
+- cluster and primary keyword
+- secondary terms
+- validated provider metrics
+- gap type and competitor evidence
+- current page or new-page recommendation
+- intent and SERP format
+- suggested audience, angle, and information requirements
+- priority, confidence, and source links
 
 ## Failure and missing-data behavior
 
-If `seo.domain_overview` returns no ranked keywords for a competitor domain (too small a site, or a typo'd domain), say so explicitly rather than fabricating gap data for it.
-
-## Example interactions
-
-**User:** "What content topics are we missing compared to our top 3 competitors?"
-**Agent:** Pulls the user's own coverage via `seo.domain_overview`, pulls the same for the 3 competitor domains, diffs to find hard gaps and weak-coverage keywords, expands top candidates with `seo.keyword_research`, filters below the volume threshold, and returns a prioritized brief list with competitor format notes from `seo.google_serp` spot-checks.
+If a competitor has no keyword data, omit it from the diff and say why. If
+metrics or SERPs are unavailable, label the brief provisional and do not
+present it as a validated opportunity.

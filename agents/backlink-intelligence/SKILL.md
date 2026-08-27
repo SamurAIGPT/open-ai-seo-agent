@@ -1,69 +1,79 @@
 ---
-name: Backlink Intelligence Agent
+name: Backlink Intelligence
 slug: backlink-intelligence
-version: 1.0.0
+version: 2.0.0
 category: seo
-description: Audit a site's backlink profile — referring domains, link types, and anchor text — and flag quality or risk issues.
-status: blueprint
+description: Analyze backlink strength, linked pages, anchor patterns, and historical changes without making unsupported toxicity claims.
+status: ready
 muapi_capabilities:
   - seo.backlinks
+  - seo.backlinks_pages
+  - seo.backlinks_history
+  - seo.domain_overview
 required_connections:
   - muapi
 permissions:
-  - read-only
+  - external-read-only
+  - workspace-write
 ---
 
-# Backlink Intelligence Agent
+# Backlink Intelligence
 
 ## Mission
 
-Audit a domain's backlink profile to answer two questions: how strong is it (referring-domain count, link quality signals), and is there anything risky in it (spammy anchor-text patterns, a suspicious spike in low-quality links)?
-
-## Use this agent when
-
-- A user wants a snapshot of their own (or a competitor's) backlink profile.
-- A user suspects a negative-SEO link attack or an unnatural link pattern.
-- A user wants an anchor-text distribution check before or after a link-building campaign.
+Explain a domain's link profile and meaningful changes using summary, page,
+item, and historical evidence. Flag patterns for human review; never issue an
+automatic disavow judgment.
 
 ## Required inputs
 
-- The domain (or specific URL) to audit.
-- Optional: a comparison domain, if this is a competitive benchmark rather than a solo audit.
-
-## Required connections
-
-- A Muapi API key (`muapi`).
-
-## Available Muapi capabilities
-
-- `seo.backlinks` (`POST /seo-backlinks`) — backlink profile summary (referring-domain and link-type counts), a list of referring domains, and individual backlink items with anchor text.
+- Target root domain or hostname.
+- Optional: comparison domains, date window, page section, and campaign date.
 
 ## Workflow
 
-1. Call `seo.backlinks` for the target domain to get the profile summary, referring-domain list, and backlink items.
-2. Compute the anchor-text distribution across the backlink items — a natural profile has a mix of branded, naked-URL, and generic anchors; a profile dominated by exact-match commercial anchors is a red flag for manipulative link building (either the site's own past campaign, or an incoming negative-SEO attack).
-3. Flag referring domains that look low-quality (if the response includes link-type/spam-adjacent signals) as worth manual review, without asserting they're definitely spam — that judgment needs human review of the actual site.
-4. If a comparison domain was supplied, call `seo.backlinks` for it too and compare referring-domain counts and anchor-text health side by side.
-5. Summarize: total referring domains, anchor-text distribution, and any flagged patterns worth a closer look.
+1. Normalize the target and decide whether subdomains should be included.
+2. Call seo.backlinks for the current profile summary, referring domains, link
+   types, anchors, and returned backlink items.
+3. Call seo.backlinks_pages when the user wants the pages attracting links or
+   when a link-growth explanation needs page-level evidence.
+4. Call seo.backlinks_history for the requested date window. Save its response
+   as a dated source; do not reconstruct history from a current summary.
+5. Call the same tasks for comparison domains only when the filters and
+   requested date window are compatible.
+6. Compute transparent distributions from returned items: branded, URL,
+   generic, commercial, or unknown anchor classes. Preserve the classification
+   rules in the report.
+7. Flag unusual concentration, abrupt history changes, or low-information
+   sources for manual review. Distinguish viral/editorial growth from
+   potentially artificial growth as hypotheses.
+8. Save a backlink snapshot so a future run can calculate a delta.
 
 ## Decision rules
 
-- Never conclude a link is "toxic" or should be disavowed outright — flag it as worth manual review and explain why, since a false-positive disavow can remove a legitimate, valuable link.
-- Treat a sudden large spike in referring domains over a short window as worth flagging regardless of anchor-text quality, since it's the single strongest signal of either a viral moment or a coordinated link scheme.
-
-## Approval boundaries
-
-`read-only` — this agent reports on the backlink profile; it never files a disavow request or takes any action on the domain's link profile. That decision belongs to the user.
+- A link is not toxic solely because of an anchor, domain metric, or provider
+  category.
+- A large change is a signal to investigate, not proof of manipulation.
+- Do not compare raw counts when limits, subdomain filters, targets, or dates
+  differ.
+- Keep target pages and referring domains separate.
+- Do not recommend disavowal, outreach, or removal automatically.
 
 ## Output format
 
-A profile summary (referring-domain count, link types), an anchor-text distribution table, and a flagged-pattern list with the reasoning for each flag.
+Return:
+
+- profile totals and filters
+- referring-domain and link-type table
+- target-page concentration
+- anchor-text distribution with sample size
+- historical changes and date window
+- manual-review flags with reasoning
+- comparison table, if requested
+- source and snapshot links
 
 ## Failure and missing-data behavior
 
-If `seo.backlinks` returns an empty or very sparse profile for a domain expected to have real link equity, say so explicitly (it may mean a new site, a canonicalization issue, or genuinely low authority) rather than treating the empty result as evidence of a specific cause.
-
-## Example interactions
-
-**User:** "Audit our backlink profile — anything look off?"
-**Agent:** Calls `seo.backlinks` for the domain, computes the anchor-text distribution, checks for referring-domain spikes, and returns a summary with any patterns flagged for manual review.
+If a response is sparse, state whether that reflects a new domain, provider
+limit, filter, or unknown cause. If history is unavailable, report the current
+profile without fabricating a trend.
