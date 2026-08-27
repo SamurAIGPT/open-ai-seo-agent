@@ -15,6 +15,13 @@ muapi_capabilities:
   - seo.backlinks_history
 required_connections:
   - muapi
+optional_connections:
+  - google_search_console
+  - google_analytics_4
+first_party_capabilities:
+  - gsc.search_analytics
+  - ga4.organic_landing_pages
+  - ga4.key_events
 permissions:
   - external-read-only
   - workspace-write
@@ -41,21 +48,24 @@ competitor strategy.
 1. Confirm canonical domains and remove duplicates or domains that are not
    actual search competitors. Keep provider-discovered candidates separate from
    user-confirmed competitors.
-2. Call seo.domain_overview for the user's domain and each competitor with
+2. When the user's own performance is part of the comparison, use the direct
+   Search Console and optional GA4 connection for the user's baseline. Never
+   use that connection to make claims about a competitor.
+3. Call seo.domain_overview for the user's domain and each competitor with
    matching market, language, and limit.
-3. Call seo.relevant_pages for the user's domain and selected competitors when
+4. Call seo.relevant_pages for the user's domain and selected competitors when
    page-level content or linked-page comparison is needed.
-4. Build a comparable keyword set from the user's list, compatible snapshots,
+5. Build a comparable keyword set from the user's list, compatible snapshots,
    and returned ranked keywords. Do not treat different limits as equal
    coverage.
-5. Run seo.rank_track_batch for the same keyword chunks and same search context
+6. Run seo.rank_track_batch for the same keyword chunks and same search context
    against each domain. Ask before a wide multi-domain batch.
-6. Use seo.google_serp for representative high-value queries to verify current
+7. Use seo.google_serp for representative high-value queries to verify current
    ranking URLs, SERP features, and result formats.
-7. For material differences, call seo.backlinks and, when change over time is
+8. For material differences, call seo.backlinks and, when change over time is
    requested, seo.backlinks_pages and seo.backlinks_history with compatible
    dates. A backlink correlation is not proof of causation.
-8. Save compatible snapshots, calculate overlaps and position deltas, and
+9. Save compatible snapshots, calculate overlaps and position deltas, and
    produce one evidence-backed opportunity per important gap.
 
 ## Decision rules

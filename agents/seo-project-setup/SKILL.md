@@ -12,6 +12,12 @@ muapi_capabilities:
   - seo.keyword_research
 required_connections:
   - muapi
+optional_connections:
+  - google_search_console
+  - google_analytics_4
+first_party_capabilities:
+  - gsc.list_sites
+  - ga4.list_properties
 permissions:
   - external-read-only
   - workspace-write
@@ -62,11 +68,15 @@ Collect these when relevant:
    ranked-keyword context, not to decide business relevance automatically.
 5. Call seo.relevant_pages when page-level context is needed. Limit the result
    to the number of pages needed for the requested workflow.
-6. If the user supplied a topic but no keyword list, call
+6. If the user wants first-party performance, use the host's direct Google
+   connection to list accessible Search Console and/or GA4 properties. Have
+   the user select the exact property, verify it matches the project, and
+   record the connection state without exposing credentials.
+7. If the user supplied a topic but no keyword list, call
    seo.keyword_research once per distinct seed topic, with a modest limit.
-7. Present the proposed project context and ask the user to correct it before
+8. Present the proposed project context and ask the user to correct it before
    broad or repeated research.
-8. Write .seo/project.md only after the context is confirmed. Record the
+9. Write .seo/project.md only after the context is confirmed. Record the
    retrieval date and links to the source records used to establish it.
 
 ## Decision rules
@@ -76,6 +86,11 @@ Collect these when relevant:
 - Keep domain, subdomain, brand, and product targets distinct.
 - Use the same country, language, device, and date conventions in later runs.
 - Never make a performance claim from setup data alone.
+- A Google property selected by the user is an optional first-party connection,
+  not proof that every domain variant is authorized.
+- If no direct Google connector is available but the user supplies Search
+  Console exports, label them as imported files with their date range and do
+  not claim that a live property is connected.
 - Do not create a recurring schedule inside this skill. Record a suggested
   cadence for the host agent or an external scheduler.
 
@@ -86,8 +101,9 @@ Return:
 1. Confirmed project context.
 2. Missing decisions, if any.
 3. Initial observed domain facts with source links.
-4. Proposed .seo/project.md contents.
-5. Recommended next skill and the smallest useful Muapi run.
+4. First-party connection state and selected properties, if connected.
+5. Proposed .seo/project.md contents.
+6. Recommended next skill and the smallest useful Muapi or first-party run.
 
 ## Failure and missing-data behavior
 

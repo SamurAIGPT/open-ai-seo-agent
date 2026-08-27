@@ -12,6 +12,10 @@ muapi_capabilities:
   - seo.account_status
 required_connections:
   - muapi
+optional_connections:
+  - google_search_console
+first_party_capabilities:
+  - gsc.search_analytics
 permissions:
   - external-read-only
   - workspace-write
@@ -35,23 +39,27 @@ valid only when the query set and search context are comparable.
 ## Workflow
 
 1. Read .seo/project.md and locate the most recent compatible ranking snapshot.
-2. Normalize and deduplicate the keyword list. Keep the exact query text used
+2. If the user asks about their own observed Google performance and Search
+   Console is connected, query `gsc.search_analytics` as supporting context.
+   Do not merge its average position into the Muapi rank snapshot or present it
+   as the same measurement.
+3. Normalize and deduplicate the keyword list. Keep the exact query text used
    for the provider.
-3. Check seo.account_status when balance or limits are unknown.
-4. Use seo.rank_track_batch for up to 50 comparable keywords per call. Split a
+4. Check seo.account_status when balance or limits are unknown.
+5. Use seo.rank_track_batch for up to 50 comparable keywords per call. Split a
    larger list into chunks with identical target domain, location, language,
    device, and depth. Ask before a broad or repeated run.
-5. Use seo.rank_track for a single diagnostic term or when a batch result needs
+6. Use seo.rank_track for a single diagnostic term or when a batch result needs
    verification.
-6. Use seo.google_serp for high-priority terms where the user needs the live
+7. Use seo.google_serp for high-priority terms where the user needs the live
    result composition, SERP features, or competing URLs—not as a replacement
    for the complete tracked set.
-7. Save the raw request and response as a dated snapshot before calculating
+8. Save the raw request and response as a dated snapshot before calculating
    changes.
-8. Compare only compatible snapshots. Calculate position change as previous
+9. Compare only compatible snapshots. Calculate position change as previous
    position minus current position; positive means improvement. Keep found,
    not-found, and provider-error states distinct.
-9. Summarize winners, losers, stable terms, new terms, lost terms, and URL
+10. Summarize winners, losers, stable terms, new terms, lost terms, and URL
    changes. Recommend investigation, not causation, unless other evidence
    supports it.
 

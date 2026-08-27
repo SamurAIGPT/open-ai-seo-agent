@@ -14,6 +14,10 @@ muapi_capabilities:
   - seo.google_serp
 required_connections:
   - muapi
+optional_connections:
+  - google_search_console
+first_party_capabilities:
+  - gsc.search_analytics
 permissions:
   - external-read-only
   - workspace-write
@@ -38,27 +42,30 @@ decision, not an unfiltered keyword dump.
 ## Workflow
 
 1. Read .seo/project.md and confirm canonical domains and priority sections.
-2. Call seo.domain_overview for the user's domain and each competitor with
+2. If connected, query the user's Search Console query/page performance to
+   verify owned coverage and identify pages already earning impressions. Keep
+   this first-party evidence separate from competitor estimates.
+3. Call seo.domain_overview for the user's domain and each competitor with
    matching market, language, and useful limits.
-3. Call seo.relevant_pages for the user domain when page-level coverage needs
+4. Call seo.relevant_pages for the user domain when page-level coverage needs
    verification. Use returned pages as evidence, not as proof that a page
    satisfies an intent.
-4. Normalize returned keyword records and create:
+5. Normalize returned keyword records and create:
    - hard gaps: competitors rank in the available data and the user domain has
      no matching record
    - weak coverage: the user domain ranks, but competitors or current SERPs
      show a materially stronger result
    Treat both sets as bounded by provider result limits.
-5. Expand important candidates with seo.keywords_for_keywords and validate the
+6. Expand important candidates with seo.keywords_for_keywords and validate the
    final terms with seo.keyword_overview or seo.keywords_search_volume.
-6. Use seo.google_serp on representative terms to determine intent, dominant
+7. Use seo.google_serp on representative terms to determine intent, dominant
    page format, ranking URL patterns, and SERP features.
-7. Group near-duplicate terms into one cluster. Identify an existing page to
+8. Group near-duplicate terms into one cluster. Identify an existing page to
    refresh when evidence supports it; otherwise propose one new page.
-8. Prioritize clusters using explicit business priority first, then validated
+9. Prioritize clusters using explicit business priority first, then validated
    demand, competitor coverage, intent fit, and effort. Label this as a
    calculated prioritization, not a provider score.
-9. Save the source records and content-brief report.
+10. Save the source records and content-brief report.
 
 ## Decision rules
 

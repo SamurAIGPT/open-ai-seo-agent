@@ -11,6 +11,10 @@ muapi_capabilities:
   - seo.relevant_pages
 required_connections:
   - muapi
+optional_connections:
+  - google_search_console
+first_party_capabilities:
+  - gsc.search_analytics
 permissions:
   - external-read-only
   - workspace-write
@@ -34,22 +38,26 @@ not enough.
 ## Workflow
 
 1. Read the source keyword list and preserve its metrics and provenance.
-2. Normalize terms for comparison but retain the original text and spelling.
-3. Call seo.keyword_overview for explicit terms when metrics are absent or
+2. If a direct Search Console connection is available, query
+   `gsc.search_analytics` with `query` and `page` dimensions. Use the returned
+   query-to-page rows as first-party evidence for existing coverage and
+   cannibalization; do not treat missing rows as proof of no impressions.
+3. Normalize terms for comparison but retain the original text and spelling.
+4. Call seo.keyword_overview for explicit terms when metrics are absent or
    need to be made comparable.
-4. Group obvious variants provisionally by topic, modifier, and funnel intent.
-5. Select representative terms from each provisional group. Call
+5. Group obvious variants provisionally by topic, modifier, and funnel intent.
+6. Select representative terms from each provisional group. Call
    seo.google_serp for those terms using the same market, language, device, and
    depth. Do not call every term unless the user asks for exhaustive evidence.
-6. Compare the top organic URLs and result types. Merge terms when the same
+7. Compare the top organic URLs and result types. Merge terms when the same
    pages and intent dominate; split terms when the SERP leaders or user intent
    differ materially.
-7. Call seo.relevant_pages for the target domain when the user wants existing
+8. Call seo.relevant_pages for the target domain when the user wants existing
    page assignments. Match returned pages to clusters only with URL or topic
    evidence; do not claim a page covers a topic from its URL alone.
-8. Assign one primary term per cluster, preserve secondary terms, and mark the
+9. Assign one primary term per cluster, preserve secondary terms, and mark the
    page target as existing page, refresh candidate, or new page.
-9. Save the cluster table and the representative SERP sources.
+10. Save the cluster table and the representative SERP sources.
 
 ## Decision rules
 
@@ -60,6 +68,9 @@ not enough.
   materially differs.
 - Flag ambiguous clusters for human review instead of forcing a decision.
 - Do not recommend a new page when a suitable existing page is evidenced.
+- If Search Console shows one query earning impressions across multiple URLs,
+  flag that as observed cannibalization evidence and keep the affected URLs in
+  the report.
 
 ## Output format
 

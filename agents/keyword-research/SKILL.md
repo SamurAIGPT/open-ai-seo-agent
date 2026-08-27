@@ -14,6 +14,10 @@ muapi_capabilities:
   - seo.google_serp
 required_connections:
   - muapi
+optional_connections:
+  - google_search_console
+first_party_capabilities:
+  - gsc.search_analytics
 permissions:
   - external-read-only
   - workspace-write
@@ -38,31 +42,38 @@ clear intent or business role.
 
 1. Read .seo/project.md when available and inherit its domain, market,
    language, business priorities, and existing keyword lists.
-2. Normalize seed terms by trimming whitespace and removing exact duplicates.
+2. If a direct Search Console connection is available for the user's own
+   property, query `gsc.search_analytics` first with query/page dimensions and
+   a bounded high row limit. Filter striking-distance positions (roughly 5–20)
+   client-side, preserve the actual rows, and enrich those queries with Muapi
+   metrics before broad discovery.
+3. Normalize seed terms by trimming whitespace and removing exact duplicates.
    Preserve the original wording in the report.
-3. For a small number of topics, call seo.keyword_research to obtain seed
+4. For a small number of topics, call seo.keyword_research to obtain seed
    metrics and ideas. For an explicit list, prefer
    seo.keywords_search_volume or seo.keyword_overview rather than one call per
    term.
-4. Expand promising seeds with seo.keywords_for_keywords and
+5. Expand promising seeds with seo.keywords_for_keywords and
    seo.related_keywords. Keep expansion depth and limits modest until the user
    approves a broad run.
-5. Deduplicate case, punctuation, and obvious singular/plural variants while
+6. Deduplicate case, punctuation, and obvious singular/plural variants while
    retaining variants that may have different search intent.
-6. Validate the final candidate set with the multi-keyword metrics endpoint
+7. Validate the final candidate set with the multi-keyword metrics endpoint
    available for the required fields. Preserve volume, difficulty, CPC, intent,
    and any provider confidence fields exactly as returned.
-7. Call seo.google_serp for representative terms across each important intent
+8. Call seo.google_serp for representative terms across each important intent
    and priority tier. Inspect ranking domains, result types, SERP features, and
    whether the query is actually relevant to the user's business.
-8. Assign a business priority using explicit user priorities first, then
+9. Assign a business priority using explicit user priorities first, then
    provider metrics and SERP evidence. Send the terms to the keyword-clustering
    skill when several terms may map to one page.
-9. Save source records and, if requested, a dated keyword research report.
+10. Save source records and, if requested, a dated keyword research report.
 
 ## Decision rules
 
 - Search volume is evidence of demand, not a promise of traffic.
+- Search Console queries are first-party evidence of the user's existing demand;
+  they do not replace market volume or difficulty metrics from Muapi.
 - Difficulty, CPC, and intent must not be invented when absent from a response.
 - Do not recommend a keyword solely because a competitor ranks for it.
 - Use SERP evidence to distinguish informational, commercial, navigational,
@@ -86,6 +97,9 @@ Return a prioritized table containing:
 - source record links
 
 Also include excluded terms, assumptions, and missing fields.
+
+When first-party data was available, identify which recommendations came from
+the user's Search Console rows and which were expanded or validated with Muapi.
 
 ## Failure and missing-data behavior
 

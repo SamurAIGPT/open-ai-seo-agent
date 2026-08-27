@@ -14,6 +14,13 @@ muapi_capabilities:
   - seo.relevant_pages
 required_connections:
   - muapi
+optional_connections:
+  - google_search_console
+  - google_analytics_4
+first_party_capabilities:
+  - gsc.search_analytics
+  - ga4.organic_landing_pages
+  - ga4.key_events
 permissions:
   - external-read-only
   - workspace-write
@@ -37,24 +44,27 @@ weakly covered topics, and validated new opportunities.
 ## Workflow
 
 1. Read .seo/project.md and any compatible ranking snapshot.
-2. Call seo.domain_overview with a useful limit to establish the domain's
+2. If direct Google connections are available, query Search Console for the
+   user's actual queries/pages and GA4 for organic landing-page or key-event
+   context. Keep those first-party observations separate from Muapi estimates.
+3. Call seo.domain_overview with a useful limit to establish the domain's
    visible keywords, pages, distribution, and provider-listed competitors.
-3. Segment returned keywords into page-one, page-two, and lower-visibility
+4. Segment returned keywords into page-one, page-two, and lower-visibility
    groups. Treat the returned limit as a sampling boundary; do not call the
    result exhaustive if the provider returned only a subset.
-4. For the highest-value candidates, call seo.rank_track_batch with the exact
+5. For the highest-value candidates, call seo.rank_track_batch with the exact
    keyword list and confirmed target domain. Keep batches to 50 or fewer and
    preserve the search context.
-5. Validate opportunity metrics with seo.keyword_overview or
+6. Validate opportunity metrics with seo.keyword_overview or
    seo.keywords_search_volume. Use the endpoint that supplies the requested
    fields and keep the provider's currency, period, and null values.
-6. Call seo.relevant_pages when a page assignment is unclear. Use
+7. Call seo.relevant_pages when a page assignment is unclear. Use
    seo.google_serp for representative terms to inspect the current result
    format, ranking URLs, and SERP features.
-7. Classify each opportunity as refresh, internal-linking, consolidation,
+8. Classify each opportunity as refresh, internal-linking, consolidation,
    technical investigation, or new content. Explain the evidence for the
    chosen lever.
-8. Save a dated report and source records when requested.
+9. Save a dated report and source records when requested.
 
 ## Decision rules
 
@@ -65,6 +75,9 @@ weakly covered topics, and validated new opportunities.
 - Do not call a page a cannibalization or technical problem without page or SERP
   evidence.
 - Separate provider metrics from calculated priority.
+- Use Search Console for the user's own query/page opportunity and GA4 for
+  landing-page or key-event impact when connected; do not replace either with
+  third-party estimates.
 - A missing rank is not automatically a rank of zero.
 
 ## Output format

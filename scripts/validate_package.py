@@ -45,6 +45,22 @@ CAPABILITIES = {
     task.removeprefix("seo-").replace("-", "_"): task for task in TASKS
 }
 
+FIRST_PARTY_CAPABILITIES = {
+    "gsc.list_sites",
+    "gsc.search_analytics",
+    "gsc.inspect_urls",
+    "ga4.list_properties",
+    "ga4.organic_landing_pages",
+    "ga4.page_performance",
+    "ga4.key_events",
+    "ga4.organic_overview",
+    "ga4.traffic_acquisition",
+    "ga4.ecommerce_performance",
+    "ga4.site_search",
+    "ga4.audience_breakdown",
+    "ga4.measurement_health",
+}
+
 
 def frontmatter(text: str) -> str:
     if not text.startswith("---\n"):
@@ -64,8 +80,8 @@ def main() -> int:
             errors.append(f"catalog is missing {task}")
 
     skills = sorted((ROOT / "agents").glob("*/SKILL.md"))
-    if len(skills) != 12:
-        errors.append(f"expected 12 skills, found {len(skills)}")
+    if len(skills) != 14:
+        errors.append(f"expected 14 skills, found {len(skills)}")
 
     readme = (ROOT / "README.md").read_text()
     for skill_file in skills:
@@ -85,6 +101,13 @@ def main() -> int:
             if task is None:
                 errors.append(f"{skill_file}: unknown capability {capability}")
 
+        first_party_names = re.findall(
+            r"^\s+-\s+((?:gsc|ga4)\.[a-z0-9_]+)\s*$", metadata, re.MULTILINE
+        )
+        for capability in first_party_names:
+            if capability not in FIRST_PARTY_CAPABILITIES:
+                errors.append(f"{skill_file}: unknown first-party capability {capability}")
+
         slug_match = re.search(r"^slug:\s*([a-z0-9-]+)\s*$", metadata, re.MULTILINE)
         if slug_match:
             link = f"agents/{slug_match.group(1)}/SKILL.md"
@@ -94,6 +117,8 @@ def main() -> int:
     for required_file in (
         "AGENTS.md",
         "references/agent-installation.md",
+        "references/google-first-party-data.md",
+        "references/google-setup.md",
         "references/reports-and-snapshots.md",
     ):
         if not (ROOT / required_file).exists():

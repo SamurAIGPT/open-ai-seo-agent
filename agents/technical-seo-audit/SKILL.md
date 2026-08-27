@@ -11,6 +11,10 @@ muapi_capabilities:
   - seo.account_status
 required_connections:
   - muapi
+optional_connections:
+  - google_search_console
+first_party_capabilities:
+  - gsc.inspect_urls
 permissions:
   - external-read-only
   - workspace-write
@@ -33,21 +37,24 @@ to crawl every URL on a site.
 ## Workflow
 
 1. Read .seo/project.md and confirm the canonical domain and device.
-2. If URLs were not supplied, call seo.relevant_pages for the target and choose
+2. If the user owns a connected Search Console property, use
+   `gsc.inspect_urls` for indexing and canonical questions before treating a
+   Lighthouse result as an indexing diagnosis.
+3. If URLs were not supplied, call seo.relevant_pages for the target and choose
    a representative set across the returned page types. Explain the selection.
-3. Check seo.account_status when the page count or provider balance is unknown.
-4. Ask before auditing a broad page set. Start with the homepage, one important
+4. Check seo.account_status when the page count or provider balance is unknown.
+5. Ask before auditing a broad page set. Start with the homepage, one important
    commercial page, one content page, and one conversion page when available.
-5. Call seo.lighthouse_audit for each selected URL. Use the same device for
+6. Call seo.lighthouse_audit for each selected URL. Use the same device for
    comparable results and save every source record.
-6. Extract category scores, Core Web Vitals, and provider-reported issues.
+7. Extract category scores, Core Web Vitals, and provider-reported issues.
    Preserve the provider's status, value, and unit. Do not infer crawl,
    indexing, canonical, schema, redirect, robots, or XML-sitemap behavior from
    a Lighthouse score.
-7. Prioritize issues by observed severity, affected business page, repeated
+8. Prioritize issues by observed severity, affected business page, repeated
    occurrence, and likely user impact. Label any prioritization formula as
    calculated.
-8. Return one concrete remediation per finding and identify the evidence that
+9. Return one concrete remediation per finding and identify the evidence that
    should be rechecked after a fix.
 
 ## Decision rules

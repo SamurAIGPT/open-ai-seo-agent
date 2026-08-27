@@ -16,6 +16,8 @@ requiring a separate SEO database or runtime service.
     YYYY-MM-DD/
       <run-slug>/
         <task-name>.json
+        gsc-<query>.json
+        ga4-<report>.json
   snapshots/
     rankings/
       <market-slug>/
@@ -75,6 +77,28 @@ Each Muapi call used in a report should be saved as JSON. Use a wrapper like:
 The request ID and billing object are optional only when the connector does not
 return them. Never include API keys, authorization headers, or secret-bearing
 URLs in a source file.
+
+Direct Google sources use the same wrapper shape, replacing capability and
+task_name with the direct connector capability and source system:
+
+~~~json
+{
+  "source_system": "google_search_console",
+  "capability": "gsc.search_analytics",
+  "retrieved_at": "2026-01-01T00:00:00Z",
+  "property": "sc-domain:example.com",
+  "request": {
+    "start_date": "2025-12-01",
+    "end_date": "2025-12-31",
+    "dimensions": ["query", "page"],
+    "filters": []
+  },
+  "result": {}
+}
+~~~
+
+Redact property identifiers when a report leaves the user's project. Never
+save OAuth tokens or refresh credentials.
 
 ## Report contract
 
