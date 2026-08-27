@@ -64,8 +64,8 @@ def main() -> int:
             errors.append(f"catalog is missing {task}")
 
     skills = sorted((ROOT / "agents").glob("*/SKILL.md"))
-    if len(skills) != 14:
-        errors.append(f"expected 14 skills, found {len(skills)}")
+    if len(skills) != 12:
+        errors.append(f"expected 12 skills, found {len(skills)}")
 
     readme = (ROOT / "README.md").read_text()
     for skill_file in skills:

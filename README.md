@@ -55,8 +55,6 @@ files are allowed so a later run can compare results.
 | [Local SEO](agents/local-seo/SKILL.md) | Analyze map results and business-profile health | Ready |
 | [AI visibility](agents/ai-visibility/SKILL.md) | Measure brand mentions, citations, share of voice, and answer quality | Ready |
 | [YouTube SEO](agents/youtube-seo/SKILL.md) | Research YouTube results and analyze videos, transcripts, and comments | Ready |
-| [SEO/PR news monitoring](agents/news-monitoring/SKILL.md) | Reserved until Muapi exposes the required news and performance data | Unavailable |
-| [App store optimization](agents/aso/SKILL.md) | Reserved until Muapi exposes app-store search and conversion data | Unavailable |
 
 The skills are intentionally composable. For example, a content strategy run
 can use project setup, keyword research, competitor SEO, content gap, and
@@ -139,9 +137,9 @@ date window are compatible.
 ## Limitations
 
 Muapi currently supplies the SEO capabilities listed in the tool catalog. This
-package does not claim native Google Search Console, Google Analytics, app-store
-data, or news-monitoring support unless a connected tool explicitly provides
-it. A Lighthouse result is a page audit, not a complete site crawl.
+package does not claim native Google Search Console or Google Analytics support
+unless a connected tool explicitly provides it. A Lighthouse result is a page
+audit, not a complete site crawl.
 
 ## License
 
